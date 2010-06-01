@@ -1,0 +1,18 @@
+urlnorm.py - Normalize URLs
+Copyright (C) 2010 Kurt McKee <contactme@kurtmckee.org>
+
+The primary goal of urlnorm.py is to normalize URLs so that,
+given two functionally identical URLs, such as
+    http://example.test:80
+    http://EXAMPLE.TEST/
+both will be reduced to this more canonical form:
+    http://example.test/
+
+The secondary goal of urlnorm.py is to provide a basic way
+to anonymize or "fix" URLs with additional or unnecessary
+crud attached. For instance, it would ideally be possible
+to modify urlnorm.py to strip out query variables that
+complicate the URL, such as those added by Feedburner:
+    ...?utm_source=feedburner&utm_medium=feed&utm_campaign...
+
+This is not release-quality software by a long shot.
