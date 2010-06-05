@@ -20,6 +20,11 @@ import re
 import urllib
 import urlparse
 
+try:
+    from urlparse import parse_qsl
+except ImportError:
+    from cgi import parse_qsl
+
 DEFAULT_PORTS = {
     'http': u'80',
     'https': u'443',
@@ -107,8 +112,9 @@ def _normalize_hostname(hostname):
         ip = filter(None, ip.groups())
         decimal_ip = 0
         for i in range(len(ip)):
+            base = (10, 8, 16)[(ip[i][0:1] == '0') + (ip[i][1:2] == 'x')]
             decimal_ip += (
-                (long(ip[i] or '0', 0) &
+                (long(ip[i] or '0', base) &
                 (256**[1, 4-i][len(ip)==i+1]-1)) <<
                 (8*[3-i, 0][len(ip)==i+1])
             )
@@ -144,13 +150,7 @@ def _normalize_path(path):
 def _normalize_query(query):
     _no_filter = lambda (k, v): True
     _filter = lambda (k, v): bool(v)
-    def _compare(x, y):
-        # Check the names first
-        return (0, -1, 1)[
-            (x[0] < y[0]) or 2*(x[0] > y[0]) or
-            (x[1] < y[1]) or 2*(x[1] > y[1]) or 0
-        ]
-    queries = urlparse.parse_qsl(query, keep_blank_values=True)
+    queries = parse_qsl(query, keep_blank_values=True)
     queries = filter(_no_filter, queries)
-    queries.sort(_compare)
+    queries.sort()
     return urllib.urlencode(queries, True)
