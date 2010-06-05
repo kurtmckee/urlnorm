@@ -81,19 +81,23 @@ def urlnorm(url):
                      urlparse.urlparse(url)
                     ))
     parts['scheme'] = _normalize_scheme(parts['scheme'])
+    parts['port'] = _normalize_port(parts['port'], parts['scheme'])
     parts['path'] = _normalize_path(parts['path'])
     parts_netloc = NETLOC.match(parts['netloc'])
     if parts_netloc is not None:
         parts.update(parts_netloc.groupdict())
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
-    if parts['port'] == DEFAULT_PORTS.get(parts['scheme'], False):
-        parts['port'] = None
     parts['query'] = _normalize_query(parts['query'])
     print parts #['query']
     return
 
 def _normalize_scheme(scheme):
     return scheme.lower() or 'http'
+
+def _normalize_port(port, scheme):
+    if scheme in DEFAULT_PORTS and DEFAULT_PORTS[scheme] == port:
+        return ''
+    return port
 
 def _normalize_percent_encoding(txt):
     unreserved = u'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~'

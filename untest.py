@@ -19,8 +19,8 @@ import sys
 
 import urlnorm
 
-def make_testcase(arg, expected):
-    return lambda self: self.worker(arg, expected)
+def make_testcase(*args):
+    return lambda self: self.worker(*args)
 
 class TestHostname(unittest.TestCase):
     def worker(self, hostname, result):
@@ -101,6 +101,20 @@ for i in range(len(schemes)):
     testcase.__doc__ = 'scheme %02i: %s' % (i, schemes[i][0])
     setattr(TestScheme, 'test_scheme_%02i' % i, testcase)
 
+class TestPort(unittest.TestCase):
+    def worker(self, port, scheme, result):
+        self.assertEqual(urlnorm._normalize_port(port, scheme), result)
+
+ports = (
+    ('', '', ''),
+    ('80', 'http', ''),
+    ('81', 'http', '81'),
+)
+for i in range(len(ports)):
+    testcase = make_testcase(*ports[i])
+    testcase.__doc__ = 'port %02i: %s' % (i, ports[i][0])
+    setattr(TestPort, 'test_port_%02i' % i, testcase)
+
 class TestQuery(unittest.TestCase):
     def worker(self, query, result):
         self.assertEqual(urlnorm._normalize_query(query), result)
@@ -124,6 +138,7 @@ testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestPath))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestScheme))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestPort))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
