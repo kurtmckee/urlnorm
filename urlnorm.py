@@ -76,7 +76,7 @@ def urlnorm(url):
                      urlparse.urlparse(url)
                     ))
     parts['scheme'] = parts['scheme'].lower() or u'http'
-    parts['path'] = _normalize_path(parts['path']) or u'/'
+    parts['path'] = _normalize_path(parts['path'])
     parts_netloc = NETLOC.match(parts['netloc'])
     if parts_netloc is not None:
         parts.update(parts_netloc.groupdict())
