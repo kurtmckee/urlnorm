@@ -87,10 +87,25 @@ for i in range(len(paths)):
     testcase.__doc__ = 'hostname %02i: %s' % (i, paths[i][0])
     setattr(TestPath, 'test_hostname_%02i' % i, testcase)
 
+class TestScheme(unittest.TestCase):
+    def worker(self, scheme, result):
+        self.assertEqual(urlnorm._normalize_scheme(scheme), result)
+
+schemes = (
+    ('', 'http'),
+    ('http', 'http'),
+    ('HTTP', 'http'),
+)
+for i in range(len(schemes)):
+    testcase = make_testcase(schemes[i][0], schemes[i][1])
+    testcase.__doc__ = 'scheme %02i: %s' % (i, schemes[i][0])
+    setattr(TestScheme, 'test_scheme_%02i' % i, testcase)
+
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestPath))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestScheme))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure

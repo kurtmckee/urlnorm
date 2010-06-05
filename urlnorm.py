@@ -75,7 +75,7 @@ def urlnorm(url):
     parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
                      urlparse.urlparse(url)
                     ))
-    parts['scheme'] = parts['scheme'].lower() or u'http'
+    parts['scheme'] = _normalize_scheme(parts['scheme'])
     parts['path'] = _normalize_path(parts['path'])
     parts_netloc = NETLOC.match(parts['netloc'])
     if parts_netloc is not None:
@@ -86,6 +86,9 @@ def urlnorm(url):
     parts['query'] = _normalize_query(parts['query'])
     print parts #['query']
     return
+
+def _normalize_scheme(scheme):
+    return scheme.lower() or 'http'
 
 def _normalize_percent_encoding(txt):
     unreserved = u'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~'
