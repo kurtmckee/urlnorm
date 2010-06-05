@@ -151,7 +151,6 @@ def _normalize_query(query):
             (x[1] < y[1]) or 2*(x[1] > y[1]) or 0
         ]
     queries = urlparse.parse_qsl(query, keep_blank_values=True)
-    print queries
     queries = filter(_no_filter, queries)
     queries.sort(_compare)
     return urllib.urlencode(queries, True)

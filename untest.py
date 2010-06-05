@@ -101,11 +101,30 @@ for i in range(len(schemes)):
     testcase.__doc__ = 'scheme %02i: %s' % (i, schemes[i][0])
     setattr(TestScheme, 'test_scheme_%02i' % i, testcase)
 
+class TestQuery(unittest.TestCase):
+    def worker(self, query, result):
+        self.assertEqual(urlnorm._normalize_query(query), result)
+
+queries = (
+    ('', ''),
+    ('a=1', 'a=1'),
+    ('a=1&a=', 'a=&a=1'),
+    ('a=1&a=1', 'a=1&a=1'),
+    ('a=1&b=2', 'a=1&b=2'),
+    ('a=2&a=1', 'a=1&a=2'),
+    ('b=1&a=2', 'a=2&b=1'),
+)
+for i in range(len(queries)):
+    testcase = make_testcase(queries[i][0], queries[i][1])
+    testcase.__doc__ = 'query %02i: %s' % (i, queries[i][0])
+    setattr(TestQuery, 'test_query_%02i' % i, testcase)
+
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestPath))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestScheme))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure
