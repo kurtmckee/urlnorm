@@ -133,6 +133,28 @@ for i in range(len(queries)):
     testcase.__doc__ = 'query %02i: %s' % (i, queries[i][0])
     setattr(TestQuery, 'test_query_%02i' % i, testcase)
 
+class TestNetlocSplit(unittest.TestCase):
+    def testEmpty(self):
+        self.assertEqual(urlnorm._split_netloc(''), {})
+    def worker(self, netloc, expected):
+        result = urlnorm._split_netloc(netloc)
+        for k in expected:
+            self.assertTrue(k in result)
+            self.assertEqual(result[k], expected[k])
+
+netlocs = (
+    ('domain.test', {'hostname': 'domain.test'}),
+    ('domain.test:81', {'port': '81', 'hostname': 'domain.test'}),
+    ('user@domain.test', {'username': 'user', 'hostname': 'domain.test'}),
+    ('user:@domain.test', {'username': 'user', 'password': '', 'hostname': 'domain.test'}),
+    ('user:pass@domain.test', {'username': 'user', 'password': 'pass', 'hostname': 'domain.test'}),
+    ('user:pass@domain.test:81', {'port': '81', 'username': 'user', 'password': 'pass', 'hostname': 'domain.test'}),
+)
+for i in range(len(netlocs)):
+    testcase = make_testcase(netlocs[i][0], netlocs[i][1])
+    testcase.__doc__ = 'netloc %02i: %s' % (i, netlocs[i][0])
+    setattr(TestNetlocSplit, 'test_netloc_%02i' % i, testcase)
+
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
@@ -140,6 +162,7 @@ testsuite.addTest(testloader.loadTestsFromTestCase(TestPath))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestScheme))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestPort))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestNetlocSplit))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure
