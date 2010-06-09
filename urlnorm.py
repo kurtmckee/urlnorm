@@ -87,7 +87,24 @@ def urlnorm(url):
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
     parts['query'] = _normalize_query(parts['query'])
     print parts #['query']
-    return
+    return _join_parts(parts)
+
+def _join_parts(parts):
+    url = '%s://' % parts['scheme']
+    if parts['username']:
+        url += parts['username']
+        if parts['password']:
+            url += ':%s' % parts['password']
+        url += '@'
+    url += parts['hostname']
+    if parts['port']:
+        url += ':%s' % parts['port']
+    url += parts['path']
+    if parts['query']:
+        url += '?%s' % parts['query']
+    if parts['fragment']:
+        url += '#%s' % parts['fragment']
+    return url
 
 def _split_netloc(netloc):
     parts_netloc = NETLOC.match(netloc)
