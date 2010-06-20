@@ -75,7 +75,9 @@ NUMERIC_IP = re.compile("""
     """, re.VERBOSE | re.IGNORECASE
 )
 
-def urlnorm(url):
+def urlnorm(url, base=None):
+    if base is not None:
+        url = urlparse.urljoin(base, url)
     url = _normalize_percent_encoding(url)
     parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
                      urlparse.urlparse(url)
