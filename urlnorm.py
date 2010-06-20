@@ -79,9 +79,7 @@ def urlnorm(url, base=None):
     if base is not None:
         url = urlparse.urljoin(base, url)
     url = _normalize_percent_encoding(url)
-    parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
-                     urlparse.urlparse(url)
-                    ))
+    parts = _urlparse(url)
     parts.update(_split_netloc(parts['netloc']))
     parts['scheme'] = _normalize_scheme(parts['scheme'])
     parts['port'] = _normalize_port(parts['port'], parts['scheme'])
@@ -90,6 +88,19 @@ def urlnorm(url, base=None):
     parts['query'] = _normalize_query(parts['query'])
     print parts #['query']
     return _join_parts(parts)
+
+def _urlparse(url):
+    parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
+                     urlparse.urlparse(url)
+                ))
+    if (not parts['scheme'] and not parts['netloc']) or \
+        (parts['path'] and not parts['path'].startswith('/') and url.startswith('%s:%s' % (parts['scheme'], parts['path']))):
+        # url may not have included a scheme, like 'domain.example'
+        # url may have been in the form 'domain.example:8080'
+        parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
+                         urlparse.urlparse('http://%s' % url)
+                    ))
+    return parts
 
 def _join_parts(parts):
     url = '%s://' % parts['scheme']
