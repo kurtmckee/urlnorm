@@ -155,6 +155,26 @@ for i in range(len(netlocs)):
     testcase.__doc__ = 'netloc %02i: %s' % (i, netlocs[i][0])
     setattr(TestNetlocSplit, 'test_netloc_%02i' % i, testcase)
 
+class TestURLParse(unittest.TestCase):
+    def worker(self, url, expected):
+        result = urlnorm._urlparse(url)
+        for k in expected:
+            self.assertTrue(k in result)
+            self.assertEqual(result[k], expected[k])
+
+urlparses = (
+    ('http://domain.test/', {'scheme': 'http', 'path': '/', 'netloc': 'domain.test'}),
+    ('http://domain.test', {'scheme': 'http', 'path': '', 'netloc': 'domain.test'}),
+    ('domain.test/', {'scheme': 'http', 'path': '/', 'netloc': 'domain.test'}),
+    ('domain.test', {'scheme': 'http', 'path': '', 'netloc': 'domain.test'}),
+    ('domain.test:8080/', {'scheme': 'http', 'path': '/', 'netloc': 'domain.test:8080'}),
+    ('domain.test:8080', {'scheme': 'http', 'path': '', 'netloc': 'domain.test:8080'}),
+)
+for i in range(len(urlparses)):
+    testcase = make_testcase(urlparses[i][0], urlparses[i][1])
+    testcase.__doc__ = 'urlparse %02i: %s' % (i, urlparses[i])
+    setattr(TestURLParse, 'test_urlparse_%02i' % i, testcase)
+
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
@@ -163,6 +183,7 @@ testsuite.addTest(testloader.loadTestsFromTestCase(TestScheme))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestPort))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestNetlocSplit))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestURLParse))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure
