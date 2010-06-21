@@ -113,6 +113,8 @@ def _join_parts(parts):
     if parts['port']:
         url += ':%s' % parts['port']
     url += parts['path']
+    if parts['parameters']:
+        url += ';%s' % parts['parameters']
     if parts['query']:
         url += '?%s' % parts['query']
     if parts['fragment']:
