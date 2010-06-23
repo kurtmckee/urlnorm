@@ -135,7 +135,8 @@ for i in range(len(queries)):
 
 class TestNetlocSplit(unittest.TestCase):
     def testEmpty(self):
-        self.assertEqual(urlnorm._split_netloc(''), {})
+        self.assertEqual(urlnorm._split_netloc(''),
+            {'username': '', 'password': '', 'hostname': '', 'port': ''})
     def worker(self, netloc, expected):
         result = urlnorm._split_netloc(netloc)
         for k in expected:
@@ -169,6 +170,8 @@ urlparses = (
     ('domain.test', {'scheme': 'http', 'path': '', 'netloc': 'domain.test'}),
     ('domain.test:8080/', {'scheme': 'http', 'path': '/', 'netloc': 'domain.test:8080'}),
     ('domain.test:8080', {'scheme': 'http', 'path': '', 'netloc': 'domain.test:8080'}),
+    ('mailto:a@b.c', {'scheme': 'mailto', 'netloc': 'a@b.c'}),
+    ('mailto:a@b.c?subject=d', {'scheme': 'mailto', 'netloc': 'a@b.c', 'query': 'subject=d'}),
 )
 for i in range(len(urlparses)):
     testcase = make_testcase(urlparses[i][0], urlparses[i][1])

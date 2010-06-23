@@ -93,7 +93,12 @@ def _urlparse(url):
     parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
                      urlparse.urlparse(url)
                 ))
-    if (not parts['scheme'] and not parts['netloc']) or \
+    if parts['scheme'].lower() == 'mailto':
+        parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
+                         urlparse.urlparse('http://%s' % parts['path'])
+                    ))
+        parts['scheme'] = 'mailto'
+    elif (not parts['scheme'] and not parts['netloc']) or \
         (parts['path'] and not parts['path'].startswith('/') and url.startswith('%s:%s' % (parts['scheme'], parts['path']))):
         # url may not have included a scheme, like 'domain.example'
         # url may have been in the form 'domain.example:8080'
@@ -103,7 +108,10 @@ def _urlparse(url):
     return parts
 
 def _join_parts(parts):
-    url = '%s://' % parts['scheme']
+    if parts['scheme'] != 'mailto':
+        url = '%s://' % parts['scheme']
+    else:
+        url = '%s:' % parts['scheme']
     if parts['username']:
         url += parts['username']
         if parts['password']:
@@ -112,7 +120,8 @@ def _join_parts(parts):
     url += parts['hostname']
     if parts['port']:
         url += ':%s' % parts['port']
-    url += parts['path']
+    if parts['scheme'] != 'mailto':
+        url += parts['path']
     if parts['parameters']:
         url += ';%s' % parts['parameters']
     if parts['query']:
@@ -125,7 +134,7 @@ def _split_netloc(netloc):
     parts_netloc = NETLOC.match(netloc)
     if parts_netloc is not None:
         return parts_netloc.groupdict()
-    return {}
+    return {'username': '', 'password': '', 'hostname': '', 'port': ''}
 
 def _normalize_scheme(scheme):
     return scheme.lower() or 'http'
