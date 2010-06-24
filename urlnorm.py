@@ -122,8 +122,8 @@ def _join_parts(parts):
         url += ':%s' % parts['port']
     if parts['scheme'] != 'mailto':
         url += parts['path']
-    if parts['parameters']:
-        url += ';%s' % parts['parameters']
+    if parts['params']:
+        url += ';%s' % parts['params']
     if parts['query']:
         url += '?%s' % parts['query']
     if parts['fragment']:
