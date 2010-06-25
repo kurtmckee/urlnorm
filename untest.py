@@ -178,6 +178,20 @@ for i in range(len(urlparses)):
     testcase.__doc__ = 'urlparse %02i: %s' % (i, urlparses[i])
     setattr(TestURLParse, 'test_urlparse_%02i' % i, testcase)
 
+# Test the entire urlnorm() pipeline
+
+class TestURLNorm(unittest.TestCase):
+    def worker(self, url, expected):
+        self.assertEqual(urlnorm.urlnorm(url), expected)
+fullurls = (
+    ("javascript:alert('')", "javascript:alert('')"),
+)
+for i in range(len(fullurls)):
+    testcase = make_testcase(fullurls[i][0], fullurls[i][1])
+    testcase.__doc__ = 'fullurls %02i: %s' % (i, fullurls[i])
+    setattr(TestURLNorm, 'test_fullurls_%02i' % i, testcase)
+
+# Load all of the testcases into a single testsuite
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
 testsuite.addTest(testloader.loadTestsFromTestCase(TestHostname))
@@ -187,6 +201,7 @@ testsuite.addTest(testloader.loadTestsFromTestCase(TestPort))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestNetlocSplit))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestURLParse))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestURLNorm))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure

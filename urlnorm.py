@@ -76,6 +76,8 @@ NUMERIC_IP = re.compile("""
 )
 
 def urlnorm(url, base=None):
+    if url.startswith('javascript:'):
+        return url
     if base is not None:
         url = urlparse.urljoin(base, url)
     url = _normalize_percent_encoding(url)
