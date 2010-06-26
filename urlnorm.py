@@ -79,8 +79,8 @@ def urlnorm(url, base=None):
     if url.startswith('javascript:'):
         return url
     if base is not None:
-        url = urlparse.urljoin(base, url)
-    url = _normalize_percent_encoding(url)
+        url = urlparse.urljoin(base.strip(), url.strip())
+    url = _normalize_percent_encoding(url.strip())
     parts = _urlparse(url)
     parts.update(_split_netloc(parts['netloc']))
     parts['scheme'] = _normalize_scheme(parts['scheme'])

@@ -181,10 +181,13 @@ for i in range(len(urlparses)):
 # Test the entire urlnorm() pipeline
 
 class TestURLNorm(unittest.TestCase):
-    def worker(self, url, expected):
-        self.assertEqual(urlnorm.urlnorm(url), expected)
+    def worker(self, args, expected):
+        self.assertEqual(urlnorm.urlnorm(*args), expected)
 fullurls = (
-    ("javascript:alert('')", "javascript:alert('')"),
+    (("javascript:alert('')",), "javascript:alert('')"),
+    # Test whitespace stripping
+    ((" http://d/p/ ",), "http://d/p/"),
+    ((" p ", " http://d2/ "), "http://d2/p"),
 )
 for i in range(len(fullurls)):
     testcase = make_testcase(fullurls[i][0], fullurls[i][1])
