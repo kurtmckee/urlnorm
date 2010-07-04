@@ -28,7 +28,6 @@ except ImportError:
 DEFAULT_PORTS = {
     'http': u'80',
     'https': u'443',
-    'ftp': u'21',
 }
 
 NETLOC = re.compile("""
@@ -76,44 +75,43 @@ NUMERIC_IP = re.compile("""
 )
 
 def urlnorm(url, base=None):
-    if url.startswith('javascript:'):
-        return url
+    newurl = url.strip()
     if base is not None:
-        url = urlparse.urljoin(base.strip(), url.strip())
-    url = _normalize_percent_encoding(url.strip())
-    parts = _urlparse(url)
+        newurl = urlparse.urljoin(base.strip(), newurl)
+    newurl = _normalize_percent_encoding(newurl)
+    parts = _urlparse(newurl)
+    if parts is None:
+        return url
     parts.update(_split_netloc(parts['netloc']))
     parts['scheme'] = _normalize_scheme(parts['scheme'])
     parts['port'] = _normalize_port(parts['port'], parts['scheme'])
     parts['path'] = _normalize_path(parts['path'])
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
     parts['query'] = _normalize_query(parts['query'])
-    print parts #['query']
     return _join_parts(parts)
 
 def _urlparse(url):
     parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
                      urlparse.urlparse(url)
                 ))
-    if parts['scheme'].lower() == 'mailto':
-        parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
-                         urlparse.urlparse('http://%s' % parts['path'])
-                    ))
-        parts['scheme'] = 'mailto'
-    elif (not parts['scheme'] and not parts['netloc']) or \
-        (parts['path'] and not parts['path'].startswith('/') and url.startswith('%s:%s' % (parts['scheme'], parts['path']))):
+    if (not parts['scheme'] and not parts['netloc']) or \
+        (
+            not parts['netloc'] and
+            parts['path'] and
+            parts['path'][0] in map(str, range(10)) and
+            url.startswith('%s:%s' % (parts['scheme'], parts['path']))
+        ):
         # url may not have included a scheme, like 'domain.example'
         # url may have been in the form 'domain.example:8080'
         parts = dict(zip(('scheme', 'netloc', 'path', 'params', 'query', 'fragment'),
                          urlparse.urlparse('http://%s' % url)
                     ))
+    elif parts['scheme'].lower() not in ('http', 'https'):
+        return None
     return parts
 
 def _join_parts(parts):
-    if parts['scheme'] != 'mailto':
-        url = '%s://' % parts['scheme']
-    else:
-        url = '%s:' % parts['scheme']
+    url = '%s://' % parts['scheme']
     if parts['username']:
         url += parts['username']
         if parts['password']:
@@ -122,8 +120,7 @@ def _join_parts(parts):
     url += parts['hostname']
     if parts['port']:
         url += ':%s' % parts['port']
-    if parts['scheme'] != 'mailto':
-        url += parts['path']
+    url += parts['path']
     if parts['params']:
         url += ';%s' % parts['params']
     if parts['query']:

@@ -170,8 +170,6 @@ urlparses = (
     ('domain.test', {'scheme': 'http', 'path': '', 'netloc': 'domain.test'}),
     ('domain.test:8080/', {'scheme': 'http', 'path': '/', 'netloc': 'domain.test:8080'}),
     ('domain.test:8080', {'scheme': 'http', 'path': '', 'netloc': 'domain.test:8080'}),
-    ('mailto:a@b.c', {'scheme': 'mailto', 'netloc': 'a@b.c'}),
-    ('mailto:a@b.c?subject=d', {'scheme': 'mailto', 'netloc': 'a@b.c', 'query': 'subject=d'}),
 )
 for i in range(len(urlparses)):
     testcase = make_testcase(urlparses[i][0], urlparses[i][1])
