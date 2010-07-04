@@ -183,6 +183,7 @@ class TestURLNorm(unittest.TestCase):
         self.assertEqual(urlnorm.urlnorm(*args), expected)
 fullurls = (
     (("javascript:alert('')",), "javascript:alert('')"),
+    (("irc://domain.test/room",), "irc://domain.test/room"),
     # Test whitespace stripping
     ((" http://d/p/ ",), "http://d/p/"),
     ((" p ", " http://d2/ "), "http://d2/p"),
