@@ -184,6 +184,7 @@ class TestURLNorm(unittest.TestCase):
 fullurls = (
     (("javascript:alert('')",), "javascript:alert('')"),
     (("irc://domain.test/room",), "irc://domain.test/room"),
+    (("feed:http://domain/feed",), "http://domain/feed"),
     # Test whitespace stripping
     ((" http://d/p/ ",), "http://d/p/"),
     ((" p ", " http://d2/ "), "http://d2/p"),

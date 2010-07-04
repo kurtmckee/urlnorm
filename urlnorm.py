@@ -76,6 +76,8 @@ NUMERIC_IP = re.compile("""
 
 def urlnorm(url, base=None):
     newurl = url.strip()
+    if newurl.lower().startswith('feed:'):
+        newurl = newurl[5:]
     if base is not None:
         newurl = urlparse.urljoin(base.strip(), newurl)
     newurl = _normalize_percent_encoding(newurl)
