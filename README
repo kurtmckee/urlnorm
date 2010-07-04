@@ -1,12 +1,16 @@
 urlnorm.py - Normalize URLs
 Copyright (C) 2010 Kurt McKee <contactme@kurtmckee.org>
 
-The primary goal of urlnorm.py is to normalize URLs so that,
-given two functionally identical URLs, such as
+The primary goal of urlnorm.py is to normalize HTTP and HTTPS URLs
+in a similar fashion to browser address bars so that, given two
+functionally identical URLs, such as
     http://domain.example:80
     http://DOMAIN.EXAMPLE/
 both will be reduced to this more canonical form:
     http://domain.example/
+
+Additionally, given a URL like `domain.example`, urlnorm.py will
+convert it to `http://domain.example/`.
 
 The secondary goal of urlnorm.py is to provide a basic way
 to anonymize or "fix" URLs with additional or unnecessary
