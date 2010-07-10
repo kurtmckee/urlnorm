@@ -50,6 +50,7 @@ NETLOC = re.compile("""
 )
 
 PERCENT_ENCODING = re.compile("%([0-9a-f]{2})", re.IGNORECASE)
+UNACCEPTABLE_QUERY_CHARS = re.compile("([^A-Za-z0-9_.~/-])")
 
 # http://www.pc-help.org/obscure.htm
 # http://www.securelist.com/en/blog/148/
@@ -89,7 +90,7 @@ def urlnorm(url, base=None):
     parts['port'] = _normalize_port(parts['port'], parts['scheme'])
     parts['path'] = _normalize_path(parts['path'])
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
-    parts['query'] = _normalize_query(parts['query'])
+    parts['query'] = _split_query(parts['query'])
     return _join_parts(parts)
 
 def _urlparse(url):
@@ -126,7 +127,7 @@ def _join_parts(parts):
     if parts['params']:
         url += ';%s' % parts['params']
     if parts['query']:
-        url += '?%s' % parts['query']
+        url += '?%s' % _join_query(parts['query'])
     if parts['fragment']:
         url += '#%s' % parts['fragment']
     return url
@@ -197,10 +198,33 @@ def _normalize_path(path):
         path.append('')
     return '/'.join(filter(lambda x: x is not None, path)) or '/'
 
-def _normalize_query(query):
-    _no_filter = lambda (k, v): True
-    _filter = lambda (k, v): bool(v)
-    queries = parse_qsl(query, keep_blank_values=True)
-    queries = filter(_no_filter, queries)
-    queries.sort()
-    return urllib.urlencode(queries, True)
+def _split_query(query):
+    # The following code's basic logic was found in the Python 2.6
+    # urlparse library, but was modified due to differing needs
+    ret = {}
+    queries = [j for i in query.split('&') for j in i.split(';')]
+    if queries == ['']:
+        return ret
+    for q in queries:
+        nv = q.split('=', 1)
+        if len(nv) == 1:
+            # Differentiate between `?n=` and ?n`
+            nv.append(None)
+        ret.setdefault(nv[0], []).append(nv[1])
+    return ret
+
+def _join_query(qdict):
+    def replace(s):
+        return u'%%%s' % hex(ord(s.group(1)))[2:].upper()
+    ret = ''
+    for k in sorted(qdict.keys()):
+        for v in sorted(qdict[k]):
+            if v is None:
+                ret += '&%s' % (re.sub(UNACCEPTABLE_QUERY_CHARS, replace, k),)
+            elif not v:
+                ret += '&%s=' % (re.sub(UNACCEPTABLE_QUERY_CHARS, replace, k),)
+            else:
+                ret += '&%s=%s' % (re.sub(UNACCEPTABLE_QUERY_CHARS, replace, k),
+                                   re.sub(UNACCEPTABLE_QUERY_CHARS, replace, v)
+                                  )
+    return ret[1:]

@@ -117,16 +117,26 @@ for i in range(len(ports)):
 
 class TestQuery(unittest.TestCase):
     def worker(self, query, result):
-        self.assertEqual(urlnorm._normalize_query(query), result)
+        self.assertEqual(urlnorm._join_query(urlnorm._split_query(query)), result)
 
 queries = (
+    # Basics
     ('', ''),
+    ('a', 'a'),
+    ('a=', 'a='),
     ('a=1', 'a=1'),
+    # Sorting
     ('a=1&a=', 'a=&a=1'),
     ('a=1&a=1', 'a=1&a=1'),
     ('a=1&b=2', 'a=1&b=2'),
     ('a=2&a=1', 'a=1&a=2'),
     ('b=1&a=2', 'a=2&b=1'),
+    # Escaping
+    ('^', '%5E'),
+    ('^=', '%5E='),
+    ('^=^', '%5E=%5E'),
+    ('a==', 'a=%3D'),
+    ('/feeds/rss', '/feeds/rss'),
 )
 for i in range(len(queries)):
     testcase = make_testcase(queries[i][0], queries[i][1])
