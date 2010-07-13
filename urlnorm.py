@@ -20,11 +20,6 @@ import re
 import urllib
 import urlparse
 
-try:
-    from urlparse import parse_qsl
-except ImportError:
-    from cgi import parse_qsl
-
 DEFAULT_PORTS = {
     'http': u'80',
     'https': u'443',
