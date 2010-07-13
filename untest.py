@@ -204,6 +204,17 @@ for i in range(len(fullurls)):
     testcase.__doc__ = 'fullurls %02i: %s' % (i, fullurls[i])
     setattr(TestURLNorm, 'test_fullurls_%02i' % i, testcase)
 
+class TestPartsPluginHook(unittest.TestCase):
+    def _plugfn(self, parts):
+        parts['path'] += 'ath'
+        return parts
+    def setUp(self):
+        urlnorm.register_parts_plugin(self._plugfn)
+    def tearDown(self):
+        urlnorm._parts_plugins = []
+    def testPartsPluginHook(self):
+        self.assertEqual(urlnorm.urlnorm('http://d/p'), 'http://d/path')
+
 # Load all of the testcases into a single testsuite
 testsuite = unittest.TestSuite()
 testloader = unittest.TestLoader()
@@ -215,6 +226,7 @@ testsuite.addTest(testloader.loadTestsFromTestCase(TestQuery))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestNetlocSplit))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestURLParse))
 testsuite.addTest(testloader.loadTestsFromTestCase(TestURLNorm))
+testsuite.addTest(testloader.loadTestsFromTestCase(TestPartsPluginHook))
 testresults = unittest.TextTestRunner(verbosity=1).run(testsuite)
 
 # Return 0 if successful, 1 if there was a failure

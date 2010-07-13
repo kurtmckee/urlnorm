@@ -75,6 +75,11 @@ NUMERIC_IP = re.compile("""
     """, re.VERBOSE | re.IGNORECASE
 )
 
+_parts_plugins = []
+
+def register_parts_plugin(fn):
+    _parts_plugins.append(fn)
+
 def urlnorm(url, base=None):
     newurl = url.strip()
     if newurl.lower().startswith('feed:'):
@@ -91,6 +96,8 @@ def urlnorm(url, base=None):
     parts['path'] = _normalize_path(parts['path'])
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
     parts['query'] = _split_query(parts['query'])
+    for fn in _parts_plugins:
+        parts.update(fn(parts))
     return _join_parts(parts)
 
 def _urlparse(url):
