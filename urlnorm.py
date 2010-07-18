@@ -80,6 +80,7 @@ def register_post_plugin(fn):
 
 def urlnorm(url, base=None):
     newurl = url.strip()
+    newurl = ''.join((v for u in newurl.split('\n') for v in u.split('\r')))
     if newurl.lower().startswith('feed:'):
         newurl = newurl[5:]
     if base is not None:

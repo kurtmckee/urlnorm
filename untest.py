@@ -200,6 +200,7 @@ fullurls = (
     # Test whitespace stripping
     ((" http://d/p/ ",), "http://d/p/"),
     ((" p ", " http://d2/ "), "http://d2/p"),
+    (("http://d/\r1/\n2\r\n/3",), "http://d/1/2/3"),
 )
 for i in range(len(fullurls)):
     testcase = make_testcase(fullurls[i][0], fullurls[i][1])
