@@ -70,10 +70,13 @@ NUMERIC_IP = re.compile("""
     """, re.VERBOSE | re.IGNORECASE
 )
 
-_parts_plugins = []
+_pre_plugins = []
+_post_plugins = []
 
-def register_parts_plugin(fn):
-    _parts_plugins.append(fn)
+def register_pre_plugin(fn):
+    _pre_plugins.append(fn)
+def register_post_plugin(fn):
+    _post_plugins.append(fn)
 
 def urlnorm(url, base=None):
     newurl = url.strip()
@@ -81,6 +84,8 @@ def urlnorm(url, base=None):
         newurl = newurl[5:]
     if base is not None:
         newurl = urlparse.urljoin(base.strip(), newurl)
+    for fn in _pre_plugins:
+        newurl = fn(newurl)
     newurl = _normalize_percent_encoding(newurl)
     parts = _urlparse(newurl)
     if parts is None:
@@ -91,7 +96,7 @@ def urlnorm(url, base=None):
     parts['path'] = _normalize_path(parts['path'])
     parts['hostname'] = _normalize_hostname(parts.get('hostname', ''))
     parts['query'] = _split_query(parts['query'])
-    for fn in _parts_plugins:
+    for fn in _post_plugins:
         parts.update(fn(parts))
     return _join_parts(parts)
 
