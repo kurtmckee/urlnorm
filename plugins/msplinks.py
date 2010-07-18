@@ -18,7 +18,7 @@ import base64
 import binascii
 
 def plugfn(url):
-    split = url.split('msplinks.com/')
+    split = url.split('msplinks.com/', 1)
     if split[0] in ('', 'www.', 'http://', 'http://www.') and split[1]:
         try:
             return base64.decodestring(split[1])[2:]
