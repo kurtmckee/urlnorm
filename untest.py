@@ -84,8 +84,8 @@ paths = (
 )
 for i in range(len(paths)):
     testcase = make_testcase(paths[i][0], paths[i][1])
-    testcase.__doc__ = 'hostname %02i: %s' % (i, paths[i][0])
-    setattr(TestPath, 'test_hostname_%02i' % i, testcase)
+    testcase.__doc__ = 'path %02i: %s' % (i, paths[i][0])
+    setattr(TestPath, 'test_path_%02i' % i, testcase)
 
 class TestScheme(unittest.TestCase):
     def worker(self, scheme, result):
