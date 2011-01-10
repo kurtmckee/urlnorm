@@ -58,7 +58,7 @@ hostnames = (
     ('524.555.568.599', '12.43.56.87'),
     ('01014.01053.01070.01127', '12.43.56.87'),
     ('0x20C.0x22B.0x238.0x257', '12.43.56.87'),
-    # Domain with only hex characters
+    # Domain with only hex characters (.ee is a valid TLD)
     ('ab.cd.ee.ee', 'ab.cd.ee.ee'),
 )
 for i in range(len(hostnames)):
